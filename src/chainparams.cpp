@@ -4,10 +4,11 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <chainparams.h>
+
 #include <chainparamsseeds.h>
 #include <consensus/merkle.h>
 #include <deploymentinfo.h>
-#include <hash.h>
+#include <hash.h> // for signet block challenge hash
 #include <script/interpreter.h>
 #include <util/string.h>
 #include <util/system.h>
@@ -35,6 +36,17 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
     return genesis;
 }
 
+/**
+ * Build the genesis block. Note that the output of its generation
+ * transaction cannot be spent since it did not originally exist in the
+ * database.
+ *
+ * CBlock(hash=000000000019d6, ver=1, hashPrevBlock=00000000000000, hashMerkleRoot=4a5e1e, nTime=1231006505, nBits=1d00ffff, nNonce=2083236893, vtx=1)
+ *   CTransaction(hash=4a5e1e, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+ *     CTxIn(COutPoint(000000, -1), coinbase 04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73)
+ *     CTxOut(nValue=50.00000000, scriptPubKey=0x5F1DF16B2B704C8A578D0B)
+ *   vMerkleTree: 4a5e1e
+ */
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
     const char* pszTimestamp = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks";
@@ -42,6 +54,9 @@ static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
 
+/**
+ * Main network on which people trade goods and services.
+ */
 class CMainParams : public CChainParams {
 public:
     CMainParams() {
@@ -57,10 +72,10 @@ public:
         consensus.SegwitHeight = 481824;
         consensus.MinBIP9WarningHeight = 483840;
         consensus.powLimit = uint256S("0000ffff00000000000000000000000000000000000000000000000000000000");
-	consensus.nPowTargetTimespan = 14 * 24 * 60 * 60;
+	    consensus.nPowTargetTimespan = 14 * 24 * 60 * 60;
         consensus.nPowTargetSpacing = 10 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true; // Allow lower difficulty for initial blocks
-        consensus.fPowNoRetargeting = false;
+        consensus.fPowNoRetargeting = true;
         consensus.nRuleChangeActivationThreshold = 1916;
         consensus.nMinerConfirmationWindow = 2016;
 
@@ -71,7 +86,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].min_activation_height = 0;
 
 
-	consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000001");
+	    consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000001");
         consensus.defaultAssumeValid = uint256{}; // 빈 값으로 설정
 						  //
         // New magic number for the forked chain
@@ -80,6 +95,9 @@ public:
         pchMessageStart[2] = 0xa9;
         pchMessageStart[3] = 0xfc;
         nDefaultPort = 8333;
+        nPruneAfterHeight = 100000;
+        m_assumed_blockchain_size = 496;
+        m_assumed_chain_state_size = 6;
 
         genesis = CreateGenesisBlock(1231006505, 2083236893, 0x1d00ffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
@@ -115,16 +133,17 @@ public:
         checkpointData = {
             {
                 {0, uint256S("0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f")},
-                {86367, uint256S("00000000001932c7abc4a2bdd3c4292b708a1480983b5495002a669bf2156224")} // Replace with actual 86367 block hash
+                 // Replace with actual 86367 block hash
             }
         };
 
         m_assumeutxo_data = MapAssumeutxo{};
 
         chainTxData = ChainTxData{
-            1285155220, // Timestamp at block 86367 (from getblockchaininfo)
-            86367,      // Approximate tx count up to block 86367
-            0.01        // Estimated tx rate
+            // Data from RPC: getchaintxstats 4096 00000000000000000009c97098b5295f7e5f183ac811fb5d1534040adb93cabd
+            .nTime    = 1661697692,
+            .nTxCount = 760120522,
+            .dTxRate  = 2.925802860942233,
         };
     }
 };
