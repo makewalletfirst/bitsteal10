@@ -71,11 +71,11 @@ public:
         consensus.CSVHeight = 419328;
         consensus.SegwitHeight = 481824;
         consensus.MinBIP9WarningHeight = 483840;
-        consensus.powLimit = uint256S("0000ffff00000000000000000000000000000000000000000000000000000000");
-	    consensus.nPowTargetTimespan = 14 * 24 * 60 * 60;
+	consensus.powLimit = uint256S("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // 비트코인 메인넷 기본
+	consensus.nPowTargetTimespan = 14 * 24 * 60 * 60;
         consensus.nPowTargetSpacing = 10 * 60;
-        consensus.fPowAllowMinDifficultyBlocks = true; // Allow lower difficulty for initial blocks
-        consensus.fPowNoRetargeting = true;
+        consensus.fPowAllowMinDifficultyBlocks = false; // Allow lower difficulty for initial blocks
+        consensus.fPowNoRetargeting = false;
         consensus.nRuleChangeActivationThreshold = 1916;
         consensus.nMinerConfirmationWindow = 2016;
 
