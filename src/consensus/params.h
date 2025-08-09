@@ -81,6 +81,16 @@ struct Params {
      */
     std::map<uint256, uint32_t> script_flag_exceptions;
     /** Block height and hash at which BIP34 becomes active */
+    
+    
+    
+    int nForkHeight = std::numeric_limits<int>::max();
+    uint256 powLimitPostFork;
+    bool fPowAllowMinDifficultyBlocksPostFork = false;
+    bool fPowNoRetargetingPostFork = false;
+
+
+
     int BIP34Height;
     uint256 BIP34Hash;
     /** Block height at which BIP65 becomes active */

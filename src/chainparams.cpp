@@ -74,8 +74,16 @@ public:
 	consensus.powLimit = uint256S("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // 비트코인 메인넷 기본
 	consensus.nPowTargetTimespan = 14 * 24 * 60 * 60;
         consensus.nPowTargetSpacing = 10 * 60;
-        consensus.fPowAllowMinDifficultyBlocks = false; // Allow lower difficulty for initial blocks
+        consensus.fPowAllowMinDifficultyBlocks = false; 
         consensus.fPowNoRetargeting = false;
+
+
+	consensus.nForkHeight = 1297;
+	consensus.powLimitPostFork = uint256S("0000ffff00000000000000000000000000000000000000000000000000000000");
+	consensus.fPowAllowMinDifficultyBlocksPostFork = true;
+        consensus.fPowNoRetargetingPostFork = true;
+
+
         consensus.nRuleChangeActivationThreshold = 1916;
         consensus.nMinerConfirmationWindow = 2016;
 
@@ -86,7 +94,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].min_activation_height = 0;
 
 
-	    consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000001");
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000001");
         consensus.defaultAssumeValid = uint256{}; // 빈 값으로 설정
 						  //
         // New magic number for the forked chain
@@ -373,7 +381,7 @@ public:
         consensus.CSVHeight = 1;    // Always active unless overridden
         consensus.SegwitHeight = 0; // Always active unless overridden
         consensus.MinBIP9WarningHeight = 0;
-        consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+	consensus.powLimit = uint256S("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // 비트코인 메인넷 기본
         consensus.nPowTargetTimespan = 14 * 24 * 60 * 60; // two weeks
         consensus.nPowTargetSpacing = 10 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true;

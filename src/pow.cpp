@@ -12,6 +12,13 @@
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
+    //포크 이후 최저 난이도 적용
+    const int nHeightNext = pindexLast ? (pindexLast->nHeight + 1) : 0;
+    if (nHeightNext >= params.nForkHeight) {
+    	return UintToArith256(params.powLimitPostFork).GetCompact();
+    }
+
+    	
     assert(pindexLast != nullptr);
     unsigned int nProofOfWorkLimit = UintToArith256(params.powLimit).GetCompact();
 
@@ -42,6 +49,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     assert(nHeightFirst >= 0);
     const CBlockIndex* pindexFirst = pindexLast->GetAncestor(nHeightFirst);
     assert(pindexFirst);
+
 
     return CalculateNextWorkRequired(pindexLast, pindexFirst->GetBlockTime(), params);
 }
@@ -122,21 +130,21 @@ bool PermittedDifficultyTransition(const Consensus::Params& params, int64_t heig
     return true;
 }
 
+
+// 이전에 작성한 'const uint256& hash' 버전 지우고, 정확히 이 시그니처로!
 bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params& params)
 {
-    bool fNegative;
-    bool fOverflow;
-    arith_uint256 bnTarget;
+    // 가장 느슨한 powLimit 사용 (프리/포스트 포크 중 큰 값)
+    const arith_uint256 pre  = UintToArith256(params.powLimit);
+    const arith_uint256 post = UintToArith256(params.powLimitPostFork);
+    const arith_uint256 bnLimit = (pre > post) ? pre : post;
 
+    arith_uint256 bnTarget;
+    bool fNegative = false, fOverflow = false;
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
 
-    // Check range
-    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > UintToArith256(params.powLimit))
-        return false;
-
-    // Check proof of work matches claimed amount
-    if (UintToArith256(hash) > bnTarget)
-        return false;
-
+    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > bnLimit) return false;
+    if (UintToArith256(hash) > bnTarget) return false;
     return true;
 }
+
